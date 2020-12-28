@@ -11,38 +11,28 @@ typedef struct
 
 
 int main(){
-  int num=14;
-  //Sample *data=(Sample)malloc(sizeof(Sample));
-  Sample data[num];
-
-  FILE *fp;
-  
+   FILE *fp;  
   if((fp=fopen("data.csv", "r"))==NULL){
     printf("File open failed");
     return EXIT_FAILURE;    
   }
-
-  char  Loc[10];
-  double Alt;
-  double Temp;
-  char buf[100];
+  int num=14;
+  Sample data[num];
   char str[100];
   
   for(int i=0; i<num;i++){
     fscanf(fp,"%[^,],%lf,%lf",str, &data[i].alt, &data[i].temp);
     data[i].loc=str;    
-    //printf("%s,%lf,%lf\n",data[i].loc,data[i].alt,data[i].temp);
   }
-
   //sort(Sample)引数a[]
   //sort(data);
-   const int dim = f_dimension();
-    double *x = malloc(dim * sizeof(double));
-    // 適当な値でa, bを初期化
-    x[0] = 10.0;
-    x[1] = 10.0;
-    double alpha=0.1;
-    printf("alpha = %f\n", alpha);
-    // 最適化する関数を動かす
-    const int iter = optimize(alpha, dim, x, data, 2,f_gradient, f_value);
+  const int dim = num;
+  double *x = malloc(dim * sizeof(double));
+  //a, bを初期化
+  x[0]=10.0;//a
+  x[1]=10.0;//b
+  double alpha=0.01;
+  // 最適化
+  const int iter = optimize(alpha, dim, x, data,f_gradient, f_value);
+  printf("%lf\n", x[0]*3.776+x[1]);  
 }
