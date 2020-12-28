@@ -1,14 +1,15 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 #include "func.h"
-
-typedef struct
-{
-  char *loc;   // location name
-  double alt;  // altitude (km)
-  double temp; // temperature (centigrade)
-} data;
-
+//  qsort用
+int compar(const void* a, const void* b) {
+    if (((Sample*)a)->alt < ((Sample*)b)->alt){
+        return 1;
+    } else {
+        return -1;
+    }
+}
 
 int main(){
    FILE *fp;  
@@ -18,14 +19,13 @@ int main(){
   }
   int num=14;
   Sample data[num];
-  char str[100];
+  char str[num][100];
   
   for(int i=0; i<num;i++){
-    fscanf(fp,"%[^,],%lf,%lf",str, &data[i].alt, &data[i].temp);
-    data[i].loc=str;    
+    fscanf(fp,"%[^,],%lf,%lf",str[i], &data[i].alt, &data[i].temp);
+    data[i].loc=str[i];
   }
-  //sort(Sample)引数a[]
-  //sort(data);
+
   const int dim = num;
   double *x = malloc(dim * sizeof(double));
   //a, bを初期化
@@ -34,5 +34,11 @@ int main(){
   double alpha=0.01;
   // 最適化
   const int iter = optimize(alpha, dim, x, data,f_gradient, f_value);
-  printf("%lf\n", x[0]*3.776+x[1]);  
+  printf("Answer is :%lf\n", x[0]*3.776+x[1]); 
+
+qsort(data, num, sizeof(Sample), compar);
+for(int i=0;i<num;++i){
+  
+  printf("%s,%lf,%lf\n",data[i].loc,data[i].alt,data[i].temp);
+}
 }
