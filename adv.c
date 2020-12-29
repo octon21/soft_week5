@@ -16,9 +16,9 @@ int main(){
   double **x,**xx,*xy,*y,*b,**trans_x, **inv_x;
   double buf;
 
-  x=(double**)malloc(n);
-  y=(double*)malloc(n);
-  for(i = 0; i < N; i++) x[i] =(double*)malloc(ex_val+1);
+  x=(double**)malloc(sizeof(double*)*n);
+  y=(double*)malloc(sizeof(double)*n);
+  for(i = 0; i < N; i++) x[i] =(double*)malloc(sizeof(double)*(ex_val+1));
   
   FILE *fp;  
   if((fp=fopen("data.csv", "r"))==NULL){
@@ -35,19 +35,16 @@ int main(){
 
 n=ex_val+1;
 
-trans_x=(double**)malloc(n);
+trans_x=(double**)malloc(sizeof(double*)*n);
 
-for(i=0;i<n;i++)trans_x[i]=(double*)malloc(N);
+for(i=0;i<n;i++)trans_x[i]=(double*)malloc(sizeof(double)*N);
 for(i=0; i<N;i++){
   for(j=0;j<n;j++)trans_x[j][i]=x[i][j];
 }
-for(i=0; i<N; i++){
-  for(j=0;j<n;j++)printf("%lf\n", trans_x[i][j]);
-  
-}
+
 //xとtrans_x積
-xx=(double**)malloc(n);
-for(i=0;i<n;i++)xx[i]=(double*)malloc(n);
+xx=(double**)malloc(sizeof(double*)*n);
+for(i=0;i<n;i++)xx[i]=(double*)malloc(sizeof(double)*n);
 
 for(i=0; i<n;i++){
   for(j=0; j<n; j++){
@@ -57,8 +54,8 @@ for(i=0; i<n;i++){
   }
 }
 //逆行列計算
-inv_x=(double**)malloc(n);
-for(i=0; i<n;i++)inv_x[i]=(double*)malloc(n);
+inv_x=(double**)malloc(sizeof(double*)*n);
+for(i=0; i<n;i++)inv_x[i]=(double*)malloc(sizeof(double)*n);
 
 for(i=0;i<n;i++){
   for(j=0;j<n;j++){
@@ -67,12 +64,14 @@ for(i=0;i<n;i++){
   }
 }
 
+
 for(i=0;i<n;i++){
   if(-1e-5<x[i][i]&&x[i][i]<1e-5){
     printf("cannot calculate invers matrix\n");
     exit(1);
   }
 }
+
 for(i = 0; i < n; i++){
   buf = 1.0 / xx[i][i];
   for(j = 0; j < n; j++){
@@ -91,24 +90,29 @@ for(i = 0; i < n; i++){
   }
 }
   // 逆行列inverse_xと目的変数yの積 
-  xy=(double*)malloc(n);
+  xy=(double*)malloc(sizeof(double)*n);
   for(i=0;i<n;i++){
     xy[i]=0.0;
     for(j=0;j< N;j++)xy[i]+=trans_x[i][j]*y[j];
   }
-  b=(double*)malloc(n);
+  b=(double*)malloc(sizeof(double)*n);
+
 
   for(i = 0; i < n; i++){
     b[i] = 0.0;
     for(j = 0; j < n; j++) b[i] += inv_x[i][j] * xy[j];
   }
+
   printf("fin mul regression\n");
 
     // 係数の表示 
     for(i = 0; i < n; i++) printf("b%d : %lf, ", i, b[i]);
     printf("\n");
 
-    for(i = 0; i < N; i++) free(x[i]);
+    printf("%lf\n", b[0]+b[1]*84+b[2]*22);
+ 
+
+    for(i = 0; i < N; i++) {x[i]=NULL;free(x[i]);}
     free(x);
 
     for(i = 0; i < n; i++) free(trans_x[i]);
@@ -122,6 +126,7 @@ for(i = 0; i < n; i++){
 
     free(xy);
     free(b);
+    y=NULL;
     free(y);
 
     return 0;
